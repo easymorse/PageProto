@@ -8,7 +8,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="user-scalable=no, width=device-width"/>
 
-
     <title>文章原型</title>
 
     <script src='javascripts/jquery/jquery-1.8.1.min.js'></script>
@@ -56,12 +55,14 @@
             -webkit-box-align: center;
 
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            /*-webkit-overflow-scrolling: touch;*/
+
             -webkit-transform-style: preserve-3d;
         }
 
         #innerContent {
             /*width: 6134px;*/
+            -webkit-backface-visibility: hidden;
         }
 
         section {
@@ -73,20 +74,25 @@
             font-size: 1.5em;
 
             -webkit-transform-style: preserve-3d;
-
-            /*margin-left: 25px;*/
-            /*margin-right: 15px;*/
-            /*padding-left: 20px;*/
-            /*padding-left: 20px;*/
-
-            /*margin: 10px;*/
-            /*padding: 15px;*/
         }
 
         p {
-            -webkit-transform-style:preserve-3d;
+            -webkit-transform-style: preserve-3d;
             padding-left: 10px;
             margin-right: 10px;
+        }
+
+        section img {
+            width: 300px;
+        }
+
+        .placeholder {
+            width: 315px;
+            height: 200px;
+            background: #fdf5e6;
+
+            /*overflow-y: auto;*/
+            /*-webkit-overflow-scrolling: touch;*/
         }
     </style>
 </head>
@@ -99,7 +105,13 @@
         <div id="innerContent">
             <section>
                 <p>明朝（1368年 1月23日－1644年
-                    4月25日[注2]）是中国历史上最后一个由汉族建立的中原王朝，历经十二世、十六位皇帝，共276年。明朝初期定都于应天府（今南京市），其辖区称为京师。1421年明成祖迁都至顺天府（今北京市），北平布政司升为京师，原京师改称南京[1]。</p>
+                    4月25日[注2]）是中国历史上最后一个由汉族建立的中原王朝，历经十二世、十六位皇帝，共276年。
+                    <img src="images/p1.png">
+                    明朝初期定都于应天府（今南京市），其辖区称为京师。1421年明成祖迁都至顺天府（今北京市），北平布政司升为京师，原京师改称南京[1]。</p>
+
+                <div id="p1" class="placeholder">
+                    <div style="width: 1000px;height: 100%;"></div>
+                </div>
 
                 <p>公元1368年，时为韩宋吴王的朱元璋，在统一陈友谅、张士诚、方国珍等群雄势力后。于当年农历正月初四日，在应天府登基，国号大明[2]。因明朝的皇帝姓朱，故又称朱明[1]。</p>
 
@@ -109,7 +121,6 @@
                 <p>
                     明朝的领土囊括今日内地十八省之范围，初年东北抵日本海、鄂霍次克海、乌地河流域，后改为辽河流域；初年北达戈壁沙漠一带，后改为今长城；西北至新疆哈密，后改为嘉峪关；并曾在今满洲、新疆东部、西藏等地设有羁縻机构。明成祖时期甚至短暂征服并统治安南（今越南北部）[1]，西元1415年，明朝领土面积达到约650万平方公里。
 
-                <p>
 
                 <p>
                     明朝是继汉唐盛世后又一个兴盛的中原王朝，也曾是手工业、经济最繁荣的国家之一。在清朝官修史书《明史》中甚至认为洪武、永乐在位时期“治隆唐宋”、“远迈汉唐”。然而由于明朝皇权过度集中，常发生皇帝昏庸不理政事，或是由宦官行使大权的陋习[1]。</p>
@@ -150,6 +161,7 @@
             </section>
         </div>
     </div>
+    <!--<div id="touchPad"></div>-->
 </div>
 <script>
     $(document).ready(function () {
@@ -157,7 +169,61 @@
             "-webkit-transform-style":"preserve-3d",
             width:'6134px'
         });
+
     });
+
+    $('#app').on('touchstart touchmove touchend',function(event){
+        event.preventDefault();
+    });
+
+
+    var currentIndex = 0;
+    var container = document.getElementById ("content");
+    var movelength = 0;
+    var beginX;
+
+    $("#content").on('touchstart',function(e){
+        event.preventDefault();
+        movelength = 0;
+        beginX = e.originalEvent.targetTouches[0].pageX;
+    });
+
+    $("#content").on('touchmove',function(e){
+        event.preventDefault();
+        movelength = e.originalEvent.targetTouches[0].pageX - beginX;
+        var positionX = -currentIndex*1023+movelength;
+        $("#innerContent").css({
+            "-webkit-transform-style":"preserve-3d",
+            '-webkit-transform' : 'translate3d(' + positionX+ 'px,0px,0px)',
+            '-webkit-transition-duration' : '0s'
+        });
+    });
+
+    $("#content").on('touchend',function(e){
+        event.preventDefault();
+        if(Math.abs(movelength)>1024/3){
+            if(movelength<0){
+                if(currentIndex < $("#innerContent").width()/1024-1){
+                    currentIndex ++;
+                }
+            } else{
+                if(currentIndex>0){
+                    currentIndex --;
+                }
+            }
+        }
+        $('#innerContent').css({
+            "-webkit-transform-style":"preserve-3d",
+            "-webkit-transition-duration":"0.5s",
+            "-webkit-transform":"translate3d(-"+(1023*currentIndex)+"px,0,0px)"
+        });
+    });
+
+    $('#p1').on('touchend',function(event){
+        alert('touch end!');
+        return false;
+    });
+
 </script>
 </body>
 </html>
