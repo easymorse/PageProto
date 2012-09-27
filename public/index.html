@@ -10,98 +10,15 @@
 
     <title>文章原型</title>
 
+    <link href="stylesheets/style.css" rel="stylesheet"/>
+
     <script src='javascripts/jquery/jquery-1.8.1.min.js'></script>
     <script src="javascripts/underscore/underscore-min.js"></script>
     <script src="javascripts/backbone/backbone-min.js"></script>
+    <script src="javascripts/handlebars/handlebars-1.0.0.beta.6.js"></script>
+    <script src="javascripts/pageproto/index.js"></script>
 
-    <style>
-        body {
-            -webkit-text-size-adjust: none;
-            -webkit-user-select: none; /* disable cut copy paste */
-            -webkit-touch-callout: none;
-            -webkit-user-drag: none;
-            margin: 0;
-            width: 1024px;
-            height: 748px;
-        }
-
-        #app {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-        }
-
-        #title {
-            background: #f5deb3;
-            height: 80px;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-box-pack: center;
-            -webkit-box-align: start;
-            padding-left: 10px;
-        }
-
-        header {
-            font-size: 2.5em;
-            font-weight: bolder;
-        }
-
-        #content {
-            height: 668px;
-            background: #f0f8ff;
-
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-box-pack: center;
-            -webkit-box-align: center;
-
-            overflow-y: auto;
-            /*-webkit-overflow-scrolling: touch;*/
-
-            -webkit-transform-style: preserve-3d;
-        }
-
-        #innerContent {
-            /*width: 6134px;*/
-            -webkit-backface-visibility: hidden;
-        }
-
-        section {
-            height: 600px;
-            width: 1024px;
-
-            -webkit-column-width: 315px;
-            -webkit-column-gap: 0px;
-            font-size: 1.5em;
-
-            -webkit-transform-style: preserve-3d;
-        }
-
-        p {
-            -webkit-transform-style: preserve-3d;
-            padding-left: 10px;
-            margin-right: 10px;
-        }
-
-        section img {
-            width: 300px;
-        }
-
-        .placeholder {
-            width: 315px;
-            height: 200px;
-            background: #fdf5e6;
-
-            /*overflow-y: auto;*/
-            /*-webkit-overflow-scrolling: touch;*/
-        }
-    </style>
-</head>
-<body>
-<div id="app">
-    <div id="title">
-        <header>明王朝简史</header>
-    </div>
-    <div id="content">
+    <script id="history_list_template" type="text/x-handlebars-template">
         <div id="innerContent">
             <section>
                 <p>明朝（1368年 1月23日－1644年
@@ -160,69 +77,26 @@
                     明成祖驾崩后，其长子朱高炽即位，即明仁宗，年号洪熙。明仁宗年龄已经偏高，即位仅一年就驾崩。其统治偏向保守固本，任用“三杨”（杨士奇、杨荣、杨溥）等贤臣辅佐朝政，停止郑和下西洋和对外战争以积蓄民力，鼓励生产，宽行省狱，力行节俭。明仁宗驾崩后长子朱瞻基即位，是为明宣宗，年号宣德。他基本继承父亲的路线，实行德政治国，并且发起最后一次下西洋。明宣宗同样热爱美术，有画作传世。但是，其执政期间也并非毫无弊端。由于明宣宗喜好养蟋蟀（古名“促织”），许多官吏因此竞相拍马，被称为“促织天子”。同时，明宣宗打破明太祖留下的宦官不得干政的规矩，一些太监如王振等人开始干政，为明英宗时期的太监专权埋下隐患。1435年明宣宗去世，九岁的朱祁镇继位，即明英宗，年号正统[8]。</p>
             </section>
         </div>
+    </script>
+
+</head>
+<body>
+<div id="app">
+    <div id="title">
+        <header>明王朝简史</header>
     </div>
+
     <!--<div id="touchPad"></div>-->
 </div>
 <script>
-    $(document).ready(function () {
-        $('#innerContent').css({
-            "-webkit-transform-style":"preserve-3d",
-            width:'6134px'
-        });
 
-    });
-
-    $('#app').on('touchstart touchmove touchend',function(event){
-        event.preventDefault();
-    });
-
-
-    var currentIndex = 0;
-    var container = document.getElementById ("content");
-    var movelength = 0;
-    var beginX;
-
-    $("#content").on('touchstart',function(e){
-        event.preventDefault();
-        movelength = 0;
-        beginX = e.originalEvent.targetTouches[0].pageX;
-    });
-
-    $("#content").on('touchmove',function(e){
-        event.preventDefault();
-        movelength = e.originalEvent.targetTouches[0].pageX - beginX;
-        var positionX = -currentIndex*1023+movelength;
-        $("#innerContent").css({
-            "-webkit-transform-style":"preserve-3d",
-            '-webkit-transform' : 'translate3d(' + positionX+ 'px,0px,0px)',
-            '-webkit-transition-duration' : '0s'
-        });
-    });
-
-    $("#content").on('touchend',function(e){
-        event.preventDefault();
-        if(Math.abs(movelength)>1024/3){
-            if(movelength<0){
-                if(currentIndex < $("#innerContent").width()/1024-1){
-                    currentIndex ++;
-                }
-            } else{
-                if(currentIndex>0){
-                    currentIndex --;
-                }
-            }
-        }
-        $('#innerContent').css({
-            "-webkit-transform-style":"preserve-3d",
-            "-webkit-transition-duration":"0.5s",
-            "-webkit-transform":"translate3d(-"+(1023*currentIndex)+"px,0,0px)"
-        });
-    });
-
-    $('#p1').on('touchend',function(event){
-        alert('touch end!');
-        return false;
-    });
+   $(document).ready(function () {
+       $('#app').on('touchstart touchmove touchend', function (event) {
+           event.preventDefault();
+       });
+       var historyList = new proto.HistoryListView;
+       historyList.render();
+   });
 
 </script>
 </body>
